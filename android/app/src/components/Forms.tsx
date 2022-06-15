@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -11,13 +11,15 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
-  useWindowDimensions
+  useWindowDimensions,
+  PermissionsAndroid
 } from 'react-native';
 import MachinePicker from './MachinePicker.jsx'
 import VariantPicker from './VariantPicker.jsx'
 import { useState } from 'react';
+import * as Location from 'expo-location';
 
-function useStyles() {
+function useStyles(): { nav: { height: number; backgroundColor: string; }; text: { lineHeight: number; fontWeight: "bold"; color: string; fontSize: number; alignSelf: "center"; }; root: { flex: number; }; content: { flex: number; justifyContent: "flex-start"; marginTop: number; paddingHorizontal: number; paddingVertical: number; }; form: { alignItems: "center"; backgroundColor: string; borderRadius: number; flexDirection: "row"; height: number; paddingHorizontal: number; marginHorizontal: number; }; label: { color: string; fontSize: number; fontWeight: "400"; lineHeight: number; width: number; }; textInput: { color: string; flex: number; }; main: { backgroundColor: string; flex: number; }; title: { color: string; fontSize: number; fontWeight: "700"; lineHeight: number; marginLeft: number; }; buttonTitle: { color: string; fontSize: number; fontWeight: "600"; lineHeight: number; }; button: { backgroundColor: string; width: string; borderRadius: number; padding: number; alignItems: "center"; color: string; height: number; marginTop: number; }; } {
   return StyleSheet.create({
     nav: {
       height: 58,
@@ -103,6 +105,41 @@ const SizedBox: React.FC<Props> = ({ height, width }) => {
 
 const Form = ({ navigation }) => {
   const styles = useStyles();
+  
+
+  const [location, setLocation] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<any>(null);
+
+  useEffect(() => { 
+    (async () => {
+      try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+      }
+      let location1 = await Location.getCurrentPositionAsync({});
+      setLocation(location1)
+    }
+    catch(error) {
+      let status= Location.getProviderStatusAsync()
+      if(!(await status).locationServicesEnabled){
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        )
+        // if (granted !== PermissionsAndroid.RESULTS.GRANTED){
+        //   alert("Location Permission is required")
+        // }
+      }
+    }
+    })();
+  }, []);
+
+  let text = 'Waiting..';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
 
   const [operatorName, setoperatorName] = useState("")
   const [operatorID, setoperatorID] = useState("")
@@ -115,8 +152,12 @@ const Form = ({ navigation }) => {
 
   let handleSubmit = async (e) => {
 
-    fetch("https://hmi-api.herokuapp.com/api", {
+    fetch("http://hmi-api.herokuapp.com/api", {
       method: "POST",
+      headers: {
+        'Accept': 'application/json, text/plain, */*',  // It can be used to overcome cors errors
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         "operatorName": operatorName,
         "operatorID": operatorID,
@@ -125,6 +166,8 @@ const Form = ({ navigation }) => {
         "variant": variant,
         "partName": partName,
         "partno": partno,
+        "latitude" : location.coords.latitude,
+        "longitude" : location.coords.longitude,
       }),
     })
       .then((response) => response.json())
@@ -210,11 +253,11 @@ return (
               </View>
             </Pressable>
             <SizedBox height={28} />
-            {/* <Text style={styles.title}>Machine Name</Text>
+            <Text style={styles.title}>Machine Name</Text>
             <MachinePicker func={setmachineName} />
             <Text style={styles.title}>Variant</Text>
             <VariantPicker func={setvariant} />
-            <SizedBox height={28} /> */}
+            <SizedBox height={28} />
 
             <Pressable>
               <View style={styles.form}>

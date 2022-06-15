@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
+import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativelocationenabler.LocationEnablerPackage;
 import com.heanoria.library.reactnative.locationenabler.RNAndroidLocationEnablerPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;

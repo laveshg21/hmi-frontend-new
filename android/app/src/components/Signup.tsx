@@ -13,6 +13,9 @@ import {
   Linking,
   View
 } from 'react-native';
+import * as Location from 'expo-location';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+
 
   const styles = StyleSheet.create({
     button: {
@@ -83,12 +86,6 @@ import {
       fontWeight: '700',
       lineHeight: 34,
     },
-    text:{
-      color: "red",
-      fontSize: 12,
-      fontWeight: 'bold',
-      alignSelf:'center'
-    }
   });
 
 interface Props {
@@ -100,44 +97,43 @@ const SizedBox: React.FC<Props> = ({ height, width }) => {
   return <View style={{ height, width }} />;
 };
 
-const LoginPage=({navigation})=> {
+const Signup=({navigation})=> {
 
-  const [FirstName, setFirstName] = useState("")
-  const [AadharNo, setAadharNo] = useState("")
-  const [message, setMessage] = useState("");
+    const [FirstName, setFirstName] = useState("")
+    const [LastName, setLastName] = useState("")
+    const [AadharNo, setAadharNo] = useState("")
+    const [EmailId, setEmailId] = useState("")
+    const [MobileNo, setMobileNo] = useState("")
 
-  let handleSubmit = async () => {
+    let handleSubmit = async (e) => {
 
-      fetch("http://hmi-api.herokuapp.com/api/login", {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json, text/plain, */*',  // It can be used to overcome cors errors
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          "firstname": FirstName,
-          "aadharno": AadharNo
-        }),
-      })
-        .then((response) => response.json())
-        .then((responseData) => {
-          console.log('Fetch Success==================');
-          console.log(responseData);
-          if(responseData["success"]==true){
-            setMessage("")
-            navigation.navigate("Form")
-          }
-          else{
-            console.log("Invalid Credentials")
-            setMessage("Invalid Credentials")
-          }
-          setFirstName("");
-          setAadharNo("");
+        fetch("http://hmi-api.herokuapp.com/api/signup", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json, text/plain, */*',  // It can be used to overcome cors errors
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            firstname: FirstName,
+            lastname: LastName,
+            aadharno: AadharNo,
+            mobile: MobileNo,
+            email: EmailId
+          }),
         })
-        .catch((error) => console.log(error))
-    }
-
-
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log('Fetch Success==================');
+            console.log(responseData);
+            setFirstName("");
+            setLastName("");
+            setAadharNo("");
+            setMobileNo("");
+            setEmailId("");
+          })
+          .catch((error) => console.log(error))
+      }
+    
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.safeAreaView}>
@@ -145,11 +141,9 @@ const LoginPage=({navigation})=> {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.content}
         >
-          <Text style={styles.title}>Welcome back!</Text>
+          <Text style={styles.title}>Create a New Account</Text>
 
           <SizedBox height={8} />
-
-          <Text style={styles.subtitle}>Sign in to your account</Text>
 
           <SizedBox height={32} />
 
@@ -174,13 +168,30 @@ const LoginPage=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>Aadhar no.</Text>
+              <Text style={styles.label}>Last Name</Text>
 
               <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
-                secureTextEntry
+                style={styles.textInput}
+                textContentType="username"
+                value={LastName}
+                onChangeText={setLastName}
+              />
+            </View>
+          </Pressable>
+
+          <SizedBox height={16} />
+
+          <Pressable>
+            <View style={styles.form}>
+              <Text style={styles.label}>Aadhar No.</Text>
+
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
                 style={styles.textInput}
                 textContentType="password"
                 maxLength={12}
@@ -192,9 +203,46 @@ const LoginPage=({navigation})=> {
 
           <SizedBox height={16} />
 
+          <Pressable>
+            <View style={styles.form}>
+              <Text style={styles.label}>Mobile No.</Text>
+
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                style={styles.textInput}
+                textContentType="password"
+                maxLength={10}
+                value={MobileNo}
+                onChangeText={setMobileNo}
+              />
+            </View>
+          </Pressable>
+
+          <SizedBox height={16} />
+
+          <Pressable>
+            <View style={styles.form}>
+              <Text style={styles.label}>Email Id</Text>
+
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                style={styles.textInput}
+                textContentType="password"
+                value={EmailId}
+                onChangeText={setEmailId}
+              />
+            </View>
+          </Pressable>
+
+          <SizedBox height={16} />
+
           <TouchableOpacity>
-          <View style={styles.forgotPasswordContainer} >
-            <Text style={styles.textButton} onPress={() => navigation.navigate('Signup')}>Don't have an account?  Sign up</Text>
+          <View style={styles.forgotPasswordContainer}>
+            <Text style={styles.textButton} onPress={() => navigation.navigate('LoginPage')}>Already have an account?  Sign in</Text>
           </View>
           </TouchableOpacity>
 
@@ -205,13 +253,12 @@ const LoginPage=({navigation})=> {
               <Text style={styles.buttonTitle}>Continue</Text>
             </View>
           </TouchableOpacity>
-          <View>{message ? <Text style={styles.text}>{message}</Text> : null}</View>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );
 };
 
-export default LoginPage;
+export default Signup;
 
 

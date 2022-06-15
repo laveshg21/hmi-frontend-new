@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 import { useState } from 'react'; 
+
 
 const VariantPicker=(props)=> {
   
    const [variant, setvariant] = useState("")
 
       return (
-         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
+
          <View style={styles.content}>
             <Picker style={styles.picker} selectedValue={variant} onValueChange={value=>{setvariant(value);props.func(value)}}>
                <Picker.Item label = "Select" value = "Select" />
@@ -20,7 +19,6 @@ const VariantPicker=(props)=> {
                <Picker.Item label = "Variant 4" value = "Variant 4" />
             </Picker>
          </View>
-         </KeyboardAvoidingView>
       )
 }
 export default VariantPicker
