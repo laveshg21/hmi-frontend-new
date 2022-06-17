@@ -10,11 +10,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  ScrollView,
   Linking,
   View
 } from 'react-native';
 import * as Location from 'expo-location';
-import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 
   const styles = StyleSheet.create({
@@ -58,10 +58,10 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
     },
     root: {
       backgroundColor: '#000000',
-      flex: 1,
+      flex: 1
     },
     safeAreaView: {
-      flex: 1,
+      flex: 1
     },
     subtitle: {
       color: 'rgba(235, 235, 245, 0.6)',
@@ -86,6 +86,12 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
       fontWeight: '700',
       lineHeight: 34,
     },
+    text:{
+      color: "red",
+      fontSize: 18,
+      fontWeight: 'bold',
+      alignSelf:'center'
+    }
   });
 
 interface Props {
@@ -104,6 +110,8 @@ const Signup=({navigation})=> {
     const [AadharNo, setAadharNo] = useState("")
     const [EmailId, setEmailId] = useState("")
     const [MobileNo, setMobileNo] = useState("")
+    const [message, setMessage] = useState("");
+
 
     let handleSubmit = async (e) => {
 
@@ -125,6 +133,9 @@ const Signup=({navigation})=> {
           .then((responseData) => {
             console.log('Fetch Success==================');
             console.log(responseData);
+            if(FirstName=="" || LastName=="" || AadharNo=="" || MobileNo=="" || EmailId==""){
+              setMessage("A required Field is missing")
+            }
             setFirstName("");
             setLastName("");
             setAadharNo("");
@@ -139,8 +150,8 @@ const Signup=({navigation})=> {
       <SafeAreaView style={styles.safeAreaView}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.content}
-        >
+          style={styles.content}>
+
           <Text style={styles.title}>Create a New Account</Text>
 
           <SizedBox height={8} />
@@ -149,9 +160,10 @@ const Signup=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>First Name</Text>
 
               <TextInput
+                placeholder='Enter Your First Name'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="email-address"
@@ -168,9 +180,10 @@ const Signup=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>Last Name</Text>
 
               <TextInput
+                placeholder='Enter Your Last Name'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
@@ -186,9 +199,10 @@ const Signup=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>Aadhar No.</Text>
 
               <TextInput
+                placeholder='Enter Your Aadhar No.'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
@@ -197,6 +211,7 @@ const Signup=({navigation})=> {
                 maxLength={12}
                 value={AadharNo}
                 onChangeText={setAadharNo}
+                keyboardType='number-pad'
               />
             </View>
           </Pressable>
@@ -205,9 +220,10 @@ const Signup=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>Mobile No.</Text>
 
               <TextInput
+                placeholder='Enter Your Mobile No.'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
@@ -216,6 +232,7 @@ const Signup=({navigation})=> {
                 maxLength={10}
                 value={MobileNo}
                 onChangeText={setMobileNo}
+                keyboardType='number-pad'
               />
             </View>
           </Pressable>
@@ -224,9 +241,10 @@ const Signup=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>Email Id</Text>
 
               <TextInput
+                placeholder='Enter Your Email ID'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
@@ -240,9 +258,9 @@ const Signup=({navigation})=> {
 
           <SizedBox height={16} />
 
-          <TouchableOpacity>
-          <View style={styles.forgotPasswordContainer}>
-            <Text style={styles.textButton} onPress={() => navigation.navigate('LoginPage')}>Already have an account?  Sign in</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}>
+          <View style={styles.forgotPasswordContainer} >
+            <Text style={styles.textButton} >Already have an account?  Sign in</Text>
           </View>
           </TouchableOpacity>
 
@@ -253,6 +271,8 @@ const Signup=({navigation})=> {
               <Text style={styles.buttonTitle}>Continue</Text>
             </View>
           </TouchableOpacity>
+          <SizedBox height={18}/>
+          <View>{message ? <Text style={styles.text}>{message}</Text> : null}</View>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>

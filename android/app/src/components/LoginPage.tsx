@@ -85,7 +85,7 @@ import {
     },
     text:{
       color: "red",
-      fontSize: 12,
+      fontSize: 18,
       fontWeight: 'bold',
       alignSelf:'center'
     }
@@ -123,7 +123,10 @@ const LoginPage=({navigation})=> {
         .then((responseData) => {
           console.log('Fetch Success==================');
           console.log(responseData);
-          if(responseData["success"]==true){
+          if(FirstName=="" || AadharNo==""){
+            setMessage("Name or Aadhar no. cannot be empty")
+          }
+          else if(responseData["success"]==true){
             setMessage("")
             navigation.navigate("Form")
           }
@@ -155,7 +158,7 @@ const LoginPage=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>First Name</Text>
+              {/* <Text style={styles.label}>First Name</Text> */}
 
               <TextInput
                 autoCapitalize="none"
@@ -166,6 +169,8 @@ const LoginPage=({navigation})=> {
                 textContentType="username"
                 value={FirstName}
                 onChangeText={setFirstName}
+                placeholder="Please enter Your Name here"
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
               />
             </View>
           </Pressable>
@@ -174,27 +179,29 @@ const LoginPage=({navigation})=> {
 
           <Pressable>
             <View style={styles.form}>
-              <Text style={styles.label}>Aadhar no.</Text>
+              {/* <Text style={styles.label}>Aadhar no.</Text> */}
 
               <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="done"
-                secureTextEntry
                 style={styles.textInput}
                 textContentType="password"
                 maxLength={12}
                 value={AadharNo}
                 onChangeText={setAadharNo}
+                keyboardType='numeric'
+                placeholder='Please enter Your Aadhar Number here'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
               />
             </View>
           </Pressable>
 
           <SizedBox height={16} />
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <View style={styles.forgotPasswordContainer} >
-            <Text style={styles.textButton} onPress={() => navigation.navigate('Signup')}>Don't have an account?  Sign up</Text>
+            <Text style={styles.textButton} >Don't have an account?  Sign up</Text>
           </View>
           </TouchableOpacity>
 
@@ -205,6 +212,7 @@ const LoginPage=({navigation})=> {
               <Text style={styles.buttonTitle}>Continue</Text>
             </View>
           </TouchableOpacity>
+          <SizedBox height={18}/>
           <View>{message ? <Text style={styles.text}>{message}</Text> : null}</View>
         </KeyboardAvoidingView>
       </SafeAreaView>
