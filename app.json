@@ -1,11 +1,15 @@
 {
   "expo": {
-    "name": "app",
+    "name": "HMI",
     "slug": "app",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "android": {
+      "package": "hmi.app",
+      "icon":"./assets/icon.png"
+    }
   },
-  "name": "app"
+  "name": "HMI"
 }

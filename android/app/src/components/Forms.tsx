@@ -18,6 +18,8 @@ import MachinePicker from './MachinePicker.jsx'
 import VariantPicker from './VariantPicker.jsx'
 import { useState } from 'react';
 import * as Location from 'expo-location';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 
 function useStyles(): { nav: { height: number; backgroundColor: string; }; text: { lineHeight: number; fontWeight: "bold"; color: string; fontSize: number; alignSelf: "center"; }; root: { flex: number; }; content: { flex: number; justifyContent: "flex-start"; marginTop: number; paddingHorizontal: number; paddingVertical: number; }; form: { alignItems: "center"; backgroundColor: string; borderRadius: number; flexDirection: "row"; height: number; paddingHorizontal: number; marginHorizontal: number; }; label: { color: string; fontSize: number; fontWeight: "400"; lineHeight: number; width: number; }; textInput: { color: string; flex: number; }; main: { backgroundColor: string; flex: number; }; title: { color: string; fontSize: number; fontWeight: "700"; lineHeight: number; marginLeft: number; }; buttonTitle: { color: string; fontSize: number; fontWeight: "600"; lineHeight: number; }; button: { backgroundColor: string; width: string; borderRadius: number; padding: number; alignItems: "center"; color: string; height: number; marginTop: number; }; } {
   return StyleSheet.create({
@@ -152,7 +154,7 @@ const Form = ({ navigation }) => {
 
   let handleSubmit = async (e) => {
 
-    fetch("http://hmi-api.herokuapp.com/api", {
+    fetch("http://hmi-api.herokuapp.com/api/", {
       method: "POST",
       headers: {
         'Accept': 'application/json, text/plain, */*',  // It can be used to overcome cors errors
@@ -187,9 +189,9 @@ const Form = ({ navigation }) => {
   }
 
 return (
-  <KeyboardAvoidingView
+  <KeyboardAwareScrollView
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    style={styles.content}
+    contentContainerStyle={styles.content}
   >
     <ScrollView>
       <View style={styles.root}>
@@ -202,8 +204,10 @@ return (
 
             <Pressable>
               <View style={styles.form}>
-                <Text style={styles.label}>Operator Name</Text>
+
                 <TextInput
+                placeholder='Operator Name'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -212,7 +216,7 @@ return (
                   textContentType="username"
                   value={operatorName}
                   onChangeText={setoperatorName}
-                  hitSlop={{ top: 30, left: 20 }}
+
                 />
               </View>
             </Pressable>
@@ -220,9 +224,10 @@ return (
 
             <Pressable>
               <View style={styles.form}>
-                <Text style={styles.label}>Operator ID no.</Text>
 
                 <TextInput
+                placeholder='Operator ID no.'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -238,9 +243,10 @@ return (
 
             <Pressable>
               <View style={styles.form}>
-                <Text style={styles.label}>IP Address</Text>
 
                 <TextInput
+                placeholder='IP Address'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -261,9 +267,10 @@ return (
 
             <Pressable>
               <View style={styles.form}>
-                <Text style={styles.label}>Part Name</Text>
 
                 <TextInput
+                placeholder='Part Name'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -279,9 +286,10 @@ return (
 
             <Pressable>
               <View style={styles.form}>
-                <Text style={styles.label}>Part Number</Text>
 
                 <TextInput
+                placeholder='Part Number'
+                placeholderTextColor="rgba(235, 235, 245, 0.6)"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -315,8 +323,9 @@ return (
           </View>
         </SafeAreaView>
       </View>
-    </ScrollView>
-  </KeyboardAvoidingView>
+      </ScrollView>
+
+  </KeyboardAwareScrollView>
 );
   };
 

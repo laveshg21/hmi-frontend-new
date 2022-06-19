@@ -14,7 +14,7 @@ import {
   Linking,
   View
 } from 'react-native';
-import * as Location from 'expo-location';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
   const styles = StyleSheet.create({
@@ -136,11 +136,14 @@ const Signup=({navigation})=> {
             if(FirstName=="" || LastName=="" || AadharNo=="" || MobileNo=="" || EmailId==""){
               setMessage("A required Field is missing")
             }
-            setFirstName("");
+            else{
+              setFirstName("");
             setLastName("");
             setAadharNo("");
             setMobileNo("");
             setEmailId("");
+            navigation.navigate("SendOTP")
+            }
           })
           .catch((error) => console.log(error))
       }
@@ -148,9 +151,11 @@ const Signup=({navigation})=> {
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.safeAreaView}>
-        <KeyboardAvoidingView
+        <KeyboardAwareScrollView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.content}>
+          contentContainerStyle={styles.content}>
+            <ScrollView>
+              <SizedBox height={110}/>
 
           <Text style={styles.title}>Create a New Account</Text>
 
@@ -273,7 +278,8 @@ const Signup=({navigation})=> {
           </TouchableOpacity>
           <SizedBox height={18}/>
           <View>{message ? <Text style={styles.text}>{message}</Text> : null}</View>
-        </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );

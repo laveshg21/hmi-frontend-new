@@ -13,8 +13,6 @@ import {
   Linking,
   View
 } from 'react-native';
-import * as Location from 'expo-location';
-import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 
   const styles = StyleSheet.create({
@@ -78,8 +76,17 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
       
     },
     textInput: {
-      color: '#FFFFFF',
-      flex: 1,
+      alignItems: 'center',
+      backgroundColor: 'rgb(58, 58, 60)',
+      borderRadius: 8,
+      flexDirection: 'row',
+      height: 48,
+      paddingHorizontal: 16,
+      color:'#FFFFFF',
+      textAlign:'center',
+      width:120,
+      alignSelf:'center',
+      fontSize:20
     },
     title: {
       color: '#FFFFFF',
@@ -88,6 +95,13 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
       lineHeight: 34,
       alignSelf:'center'
     },
+    text:{
+      color: "green",
+      fontSize: 18,
+      fontWeight: 'bold',
+      alignSelf:'center',
+      textAlign:'center'
+    }
   });
 
 interface Props {
@@ -102,51 +116,33 @@ const SizedBox: React.FC<Props> = ({ height, width }) => {
 const LoginPage=({navigation})=> {
 
 
-  const [location, setLocation] = useState<any>(null);
-  const [errorMsg, setErrorMsg] = useState<any>(null);
+  const [otp, setotp] = useState("");
+  const [message, setMessage] = useState("");
 
-  useEffect(() => { 
-    (async () => {
-      try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-      }
-      let location1 = await Location.getCurrentPositionAsync({});
-      setLocation(location1)
-      fetch("https://httpbin.org/post", {
+  let handleSubmit = async (e) => {
+
+    fetch("http://hmi-api.herokuapp.com/api/otp", {
       method: "POST",
+      headers: {
+        'Accept': 'application/json, text/plain, */*',  // It can be used to overcome cors errors
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        "location":location,
+        otp:otp
       }),
     })
-    .then((response) => response.json())
-    .then((responseData) => {
-      console.log('Fetch Success==================');
-      console.log(responseData);
-      setLocation(null)
-    })
-      
-    }
-    catch(error) {
-      let status= Location.getProviderStatusAsync()
-      if(!(await status).locationServicesEnabled){
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        )
-        // if (granted !== PermissionsAndroid.RESULTS.GRANTED){
-        //   alert("Location Permission is required")
-        // }
-      }
-    }
-    })();
-  }, []);
-
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
+      .then((response) => response.json())
+      .then((responseData) => {
+        console.log('Fetch Success==================');
+        console.log(responseData);
+        if(responseData["success"]){
+          setMessage(`Account Verified Successfully ! Click here to proceed to Login Page.`)        }
+        else{
+          setMessage("Account not Verified.")
+        }
+        setotp("")
+      })
+      .catch((error) => console.log(error))
   }
 
   return (
@@ -160,18 +156,20 @@ const LoginPage=({navigation})=> {
 
           <SizedBox height={30} />
 
-          <Text style={styles.subtitle}>An OTP is sent to the registered mobile number. Please enter it to proceed</Text>
+          <Text style={styles.subtitle}>An OTP is sent to the registered mobile number and email ID. Please enter it to proceed</Text>
 
           <SizedBox height={32} />
 
-          <SizedBox height={16} />
+          <TextInput style={styles.textInput} value={otp} onChangeText={setotp}></TextInput>
 
-          <SizedBox height={16} />
+          <SizedBox height={32} />
 
-          <TouchableOpacity onPress={() => navigation.navigate('Form')}>
+          <TouchableOpacity onPress={handleSubmit}>
             <View style={styles.button}>
               <Text style={styles.buttonTitle}>Continue</Text>
             </View>
+            <SizedBox height={32} />
+            <View>{message ? <Text style={styles.text} onPress={()=>navigation.navigate("LoginPage")}>{message}</Text> : null}</View>
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </SafeAreaView>
