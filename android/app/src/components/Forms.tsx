@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import {
-  Alert,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
   SafeAreaView,
@@ -11,7 +9,6 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
-  useWindowDimensions,
   PermissionsAndroid
 } from 'react-native';
 import MachinePicker from './MachinePicker.jsx'
@@ -19,9 +16,11 @@ import VariantPicker from './VariantPicker.jsx'
 import { useState } from 'react';
 import * as Location from 'expo-location';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import RadioForm from 'react-native-simple-radio-button';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 
-function useStyles(): { nav: { height: number; backgroundColor: string; }; text: { lineHeight: number; fontWeight: "bold"; color: string; fontSize: number; alignSelf: "center"; }; root: { flex: number; }; content: { flex: number; justifyContent: "flex-start"; marginTop: number; paddingHorizontal: number; paddingVertical: number; }; form: { alignItems: "center"; backgroundColor: string; borderRadius: number; flexDirection: "row"; height: number; paddingHorizontal: number; marginHorizontal: number; }; label: { color: string; fontSize: number; fontWeight: "400"; lineHeight: number; width: number; }; textInput: { color: string; flex: number; }; main: { backgroundColor: string; flex: number; }; title: { color: string; fontSize: number; fontWeight: "700"; lineHeight: number; marginLeft: number; }; buttonTitle: { color: string; fontSize: number; fontWeight: "600"; lineHeight: number; }; button: { backgroundColor: string; width: string; borderRadius: number; padding: number; alignItems: "center"; color: string; height: number; marginTop: number; }; } {
+function useStyles() { 
   return StyleSheet.create({
     nav: {
       height: 58,
@@ -35,14 +34,16 @@ function useStyles(): { nav: { height: number; backgroundColor: string; }; text:
       alignSelf: 'center'
     },
     root: {
-      flex: 1
+      flex: 1,
     },
     content: {
       flex: 1,
+      height: '100%',
       justifyContent: 'flex-start',
       marginTop: 33,
       paddingHorizontal: 0,
       paddingVertical: 0,
+      backgroundColor:'black'
     },
     form: {
       alignItems: 'center',
@@ -66,7 +67,8 @@ function useStyles(): { nav: { height: number; backgroundColor: string; }; text:
     },
     main: {
       backgroundColor: 'black',
-      flex: 1
+      flex: 1,
+      height:'100%'
     },
     title: {
       color: 'rgba(235, 235, 245, 0.8)',
@@ -92,8 +94,6 @@ function useStyles(): { nav: { height: number; backgroundColor: string; }; text:
       marginTop: 30
     }
   })
-
-
 }
 
 interface Props {
@@ -142,7 +142,7 @@ const Form = ({ navigation }) => {
   } else if (location) {
     text = JSON.stringify(location);
   }
-
+  const nullDate = new Date();
   const [operatorName, setoperatorName] = useState("")
   const [operatorID, setoperatorID] = useState("")
   const [IPAddress, setIPAddress] = useState("")
@@ -151,10 +151,15 @@ const Form = ({ navigation }) => {
   const [partName, setpartName] = useState("")
   const [partno, setpartno] = useState("")
   const [message, setMessage] = useState("");
-
+  const [chosenOption, setChosenOption] = useState(''); //will store our current user options
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [date,setDate] = useState<Date>(nullDate);
+  const [time, setTime] = useState<Date>(nullDate);
+  const [datetime, setDatetime] = useState("")
   let handleSubmit = async (e) => {
 
-    fetch("http://hmi-api.herokuapp.com/api/", {
+    fetch("http://hmi-api.herokuapp.com/api/log", {
       method: "POST",
       headers: {
         'Accept': 'application/json, text/plain, */*',  // It can be used to overcome cors errors
@@ -170,6 +175,8 @@ const Form = ({ navigation }) => {
         "partno": partno,
         "latitude" : location.coords.latitude,
         "longitude" : location.coords.longitude,
+        "status":chosenOption,
+        "time": datetime,
       }),
     })
       .then((response) => response.json())
@@ -188,9 +195,48 @@ const Form = ({ navigation }) => {
       .catch((error) => console.log(error))
   }
 
+  const radio_props = [
+    { label: (<View style={{marginRight:5,paddingHorizontal:5}}><Text style={{color: '#FFFFFF',fontSize:20,marginEnd:10}}>{'In'}</Text></View>), value: "In", size:8 },
+    { label: (<Text style={{color: '#FFFFFF',fontSize:18}}>{'Out'}</Text>), value: "Out" },
+  ];
+
+  const showDatePicker = () => {
+    setDate(nullDate);
+    setTime(nullDate)
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const hideTimePicker = () => {
+    formatDate(date,time);
+    setTimePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    setDate(date);
+    hideDatePicker();
+    setDate(nullDate);
+    setTime(nullDate);
+    setTimePickerVisibility(true);
+  };
+  const handleConfirm2 = (time) => {
+    setTime(time);
+    hideTimePicker();
+  };
+
+  const formatDate = (date,time)=> {
+    let dt = date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()+" "+time.getHours()+":"+time.getMinutes();
+    setDatetime(dt)
+    return dt;
+  }
+
+
 return (
+
   <KeyboardAwareScrollView
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     contentContainerStyle={styles.content}
   >
     <ScrollView>
@@ -302,6 +348,35 @@ return (
               </View>
             </Pressable>
             <SizedBox height={16} />
+            <View style={{marginLeft:15,display:'flex',flexDirection:'row',marginTop:10,justifyContent:'space-around'}}>
+            <RadioForm
+            formHorizontal={true}
+            labelHorizontal={true}
+            labelColor={'white'}
+        radio_props={radio_props}
+        initial="In" //initial value of this group
+        onPress={(value) => {
+          setChosenOption(value);
+        }} //if the user changes options, set the new value
+      />
+      <TouchableOpacity onPress={showDatePicker}>
+      <View style={{backgroundColor:'rgb(58, 58, 60)',height:50,width:200,borderRadius:4,marginTop:-6}}><Text style={{color: '#FFFFFF',fontSize:18}}>{datetime}</Text></View>
+      </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <DateTimePickerModal
+        isVisible={isTimePickerVisible}
+        mode="time"
+        onConfirm={handleConfirm2}
+        onCancel={hideTimePicker}
+      />
+            </View>
+            
+            
             <View style={{ flexDirection: 'row', justifyContent: "space-around", paddingBottom:20 }}>
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <View >
