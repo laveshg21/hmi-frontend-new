@@ -156,7 +156,7 @@ const Form = ({ navigation }) => {
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [date,setDate] = useState<Date>(nullDate);
   const [time, setTime] = useState<Date>(nullDate);
-  const [datetime, setDatetime] = useState("")
+  const [datetime, setDatetime] = useState("Add Date and Time")
   let handleSubmit = async (e) => {
 
     fetch("http://hmi-api.herokuapp.com/api/log", {
@@ -218,7 +218,6 @@ const Form = ({ navigation }) => {
   const handleConfirm = (date) => {
     setDate(date);
     hideDatePicker();
-    setDate(nullDate);
     setTime(nullDate);
     setTimePickerVisibility(true);
   };
@@ -228,7 +227,7 @@ const Form = ({ navigation }) => {
   };
 
   const formatDate = (date,time)=> {
-    let dt = date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()+" "+time.getHours()+":"+time.getMinutes();
+    let dt = ("0"+date.getDate()).slice(-2)+"-"+("0"+(date.getMonth()+1)).slice(-2)+"-"+date.getFullYear()+" "+("0"+time.getHours()).slice(-2)+":"+("0"+time.getMinutes()).slice(-2);
     setDatetime(dt)
     return dt;
   }
@@ -360,7 +359,7 @@ return (
         }} //if the user changes options, set the new value
       />
       <TouchableOpacity onPress={showDatePicker}>
-      <View style={{backgroundColor:'rgb(58, 58, 60)',height:50,width:200,borderRadius:4,marginTop:-6}}><Text style={{color: '#FFFFFF',fontSize:18}}>{datetime}</Text></View>
+      <View style={{backgroundColor:'rgb(58, 58, 60)',height:50,width:200,borderRadius:4,marginTop:-6,alignItems:'center'}}><Text style={{color: '#FFFFFF',fontSize:16,marginTop:8}}>{datetime}</Text></View>
       </TouchableOpacity>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}

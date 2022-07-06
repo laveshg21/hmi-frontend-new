@@ -152,7 +152,6 @@ const Signup=({navigation})=> {
     <View style={styles.root}>
       <SafeAreaView style={styles.safeAreaView}>
         <KeyboardAwareScrollView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           contentContainerStyle={styles.content}>
             <ScrollView>
               <SizedBox height={110}/>
