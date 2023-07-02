@@ -9,7 +9,12 @@
     ],
     "android": {
       "package": "hmi.app",
-      "icon":"./assets/icon.png"
+      "icon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c7293a8a-6613-4065-b13a-c2bce84bb979"
+      }
     }
   },
   "name": "HMI"
